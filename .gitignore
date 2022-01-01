@@ -2,3 +2,5 @@
 .DS_Store
 *.pyc
 .vscode/launch.json
+*.txt
+*.png
