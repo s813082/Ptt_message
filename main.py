@@ -50,11 +50,15 @@ def analysis_data(entries_list):
         if title not in title_list:
             message_content = ''
             message_dict = post.get("pushes")
-            for message in message_dict:
-                raw_message = message.get("content").replace(": ","")
-                message_content = message_content + raw_message
-            message_list.append(message_content)
-            title_list.append(title)
+            if message_dict != None:
+                for message in message_dict:
+                    raw_message = message.get("content").replace(": ","")
+                    message_content = message_content + raw_message
+                message_list.append(message_content)
+                title_list.append(title)
+            else:
+                # 如果發文就不列入追蹤
+                continue
     return message_list
 
 # 遞迴取得所有文章
@@ -80,17 +84,20 @@ def loop_get_message_list(year_firstday,year_lastday,search_account,page,per_pag
             temp_entries_list = []
             for post in entries:
                 pushes = post.get("pushes")
-                push_time_string = pushes[0].get("pushed_at")
-                push_time_string_split = push_time_string.split("T")
-                push_time = datetime.datetime.strptime(push_time_string_split[0], "%Y-%m-%d")
-                if push_time >= year_firstday and push_time < year_lastday:
-                    temp_entries_list.append(post)
+                if pushes != None:
+                    push_time_string = pushes[0].get("pushed_at")
+                    push_time_string_split = push_time_string.split("T")
+                    push_time = datetime.datetime.strptime(push_time_string_split[0], "%Y-%m-%d")
+                    if push_time >= year_firstday and push_time < year_lastday:
+                        temp_entries_list.append(post)
+                    else:
+                        break
                 else:
-                    break
+                    continue
             entries_list = entries_list + temp_entries_list
             return entries_list
     else:
-        raise Exception(f"Get Url failed status code: {ptt_data.status_code}")
+        raise Exception(f"Get Url : {url} failed status code: {ptt_data.status_code}")
 
 
 # 輸入要查詢帳號
